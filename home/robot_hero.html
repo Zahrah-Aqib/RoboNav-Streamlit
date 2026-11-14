@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<style>
+/* This is the original React homepage's *decorative* robot, not the
+   newer scroll-controlled RoboNav-3D character. The real AI remains 2D. */
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent}
+.scene{position:relative;isolation:isolate;width:100%;height:356px;overflow:hidden;
+ background:radial-gradient(ellipse 50% 55% at 50% 45%,rgba(20,135,169,.10),transparent 75%)}
+.glow{position:absolute;inset:0;background:radial-gradient(ellipse 35% 40% at 51% 48%,rgba(34,211,238,.13),transparent 95%);filter:blur(26px)}
+canvas{position:absolute;inset:0;display:block}
+.caption{position:absolute;bottom:0;left:0;right:0;text-align:center;color:#8294b3;font:11px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.01em}
+.fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.fallback-bot{position:relative;width:175px;height:270px;filter:drop-shadow(0 0 26px rgba(34,211,238,.25));
+ animation:float 3.4s ease-in-out infinite}
+.head{position:absolute;left:43px;top:25px;width:92px;height:78px;border:3px solid #285a74;
+ background:linear-gradient(140deg,#20314b,#0f192a);border-radius:20px;display:flex;
+ align-items:center;justify-content:center;gap:23px;box-shadow:inset 0 6px 12px #091525}
+.eye{width:13px;height:11px;border-radius:50%;background:#67e8f9;box-shadow:0 0 19px #22d3ee}
+.antenna{position:absolute;left:86px;top:0;width:4px;height:27px;background:#173d50}
+.antenna::before{content:"";position:absolute;top:-5px;left:-6px;width:16px;height:16px;border-radius:50%;background:#67e8f9}
+.torso{position:absolute;left:27px;top:116px;width:122px;height:120px;background:linear-gradient(155deg,#172a45,#0b1324);
+ border:2px solid #365375;border-radius:25px}
+.chest{position:absolute;left:40px;top:34px;width:40px;height:40px;border:2px solid #40cadd;
+ background:rgba(34,211,238,.22);border-radius:11px;box-shadow:0 0 26px #22d3ee55}
+.arm{position:absolute;top:135px;width:19px;height:90px;border-radius:14px;background:#1d3453;border:2px solid #23435e}
+.arm.left{left:2px;transform:rotate(12deg)}.arm.right{right:2px;transform:rotate(-12deg)}
+.foot{position:absolute;top:239px;width:37px;height:17px;border-radius:14px;background:#253d5a}
+.foot.left{left:43px}.foot.right{right:43px}
+.hoverring{position:absolute;bottom:31px;left:50%;width:210px;height:34px;
+ transform:translateX(-50%);border:2px solid #1c9cae;border-radius:50%;box-shadow:0 0 30px #22d3ee55}
+@keyframes float{to{transform:translateY(-11px)}}
+@media(prefers-reduced-motion:reduce){.fallback-bot{animation:none}}
+</style>
+</head>
+<body>
+<div class="scene" aria-label="Decorative floating RoboNav robot">
+ <div class="glow"></div>
+ <div id="fallback" class="fallback">
+  <div class="fallback-bot">
+   <div class="antenna"></div>
+   <div class="head"><span class="eye"></span><span class="eye"></span></div>
+   <div class="torso"><div class="chest"></div></div>
+   <div class="arm left"></div><div class="arm right"></div>
+   <div class="foot left"></div><div class="foot right"></div>
+  </div>
+ </div>
+ <div class="hoverring"></div>
+ <div class="caption">decorative 3D scene · simulation runs in 2D</div>
+</div>
+<script type="module">
+// Port of the geometric Three.js robot in the original React homepage.
+// It uses only public, trusted library code and never receives user data.
+// If Three.js or WebGL cannot load, the built-in CSS robot remains visible.
+try {
+  const THREE = await import("https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js");
+  const sceneRoot = document.querySelector(".scene");
+  if (!document.createElement("canvas").getContext("webgl")) {
+    throw new Error("WebGL unavailable");
+  }
+  const w = () => Math.max(1, sceneRoot.clientWidth);
+  const h = () => Math.max(1, sceneRoot.clientHeight);
+  const renderer = new THREE.WebGLRenderer({alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  renderer.setSize(w(), h());
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  sceneRoot.insertBefore(renderer.domElement,document.querySelector(".caption"));
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(42,w()/h(),0.1,100);
+  camera.position.set(0,1.4,6.2);
+  const keyLight = new THREE.DirectionalLight(0xbfecff,1.1);
+  keyLight.position.set(3,5,4);scene.add(keyLight);
+  const rimLight = new THREE.PointLight(0x22d3ee,2.4,20);
+  rimLight.position.set(-3,2,-3);scene.add(rimLight);
+  scene.add(new THREE.AmbientLight(0x334466,.7));
+  const body = new THREE.MeshStandardMaterial({color:0x16233f,metalness:.6,roughness:.35});
+  const panel = new THREE.MeshStandardMaterial({color:0x22d3ee,emissive:0x22d3ee,
+     emissiveIntensity:.7,metalness:.2,roughness:.4});
+  const eye = new THREE.MeshStandardMaterial({color:0x67e8f9,emissive:0x67e8f9,emissiveIntensity:1.4});
+  const robot = new THREE.Group();
+  const part = (geo,mat,x,y,z) => {
+    const mesh = new THREE.Mesh(geo,mat);mesh.position.set(x,y,z);robot.add(mesh);return mesh;
+  };
+  part(new THREE.BoxGeometry(1.5,1.7,.9),body,0,0,0);
+  part(new THREE.BoxGeometry(.7,.5,.08),panel,0,.15,.48);
+  const head = part(new THREE.BoxGeometry(.95,.75,.85),body,0,1.25,0);
+  for (const x of [-.2,.2]) {
+    const e=new THREE.Mesh(new THREE.BoxGeometry(.16,.1,.06),eye);
+    e.position.set(x,.08,.44);head.add(e);
+  }
+  const antenna = new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,.5),body);
+  antenna.position.set(0,.6,0);head.add(antenna);
+  const tip = new THREE.Mesh(new THREE.SphereGeometry(.07,16,16),panel);
+  tip.position.y=.3;antenna.add(tip);
+  for(const x of [-1.05,1.05]){
+    const arm=part(new THREE.CapsuleGeometry(.16,.9,4,8),body,x,.1,0);
+    arm.rotation.z=x<0?.15:-.15;
+  }
+  for(const x of [-.95,.95])part(new THREE.SphereGeometry(.22,16,16),panel,x,.62,0);
+  const ring=part(new THREE.TorusGeometry(1.15,.05,12,48),panel,0,-1.15,0);
+  ring.rotation.x=Math.PI/2;
+  scene.add(robot);
+  const grid = new THREE.GridHelper(14,28,0x164e63,0x0e2733);
+  grid.position.y=-1.6;scene.add(grid);
+  document.querySelector("#fallback").style.display="none";
+  // Do not draw a second CSS hover ring over the WebGL ring.
+  document.querySelector(".hoverring").style.opacity="0";
+  let target=0,clock=0,frame=0;
+  const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const mouse=(event)=>{
+    const bounds=sceneRoot.getBoundingClientRect();
+    target=((event.clientX-bounds.left)/Math.max(1,bounds.width)-.5)*.7;
+  };
+  sceneRoot.addEventListener("pointermove",mouse,{passive:true});
+  const resize=()=>{
+    camera.aspect=w()/h();camera.updateProjectionMatrix();renderer.setSize(w(),h());
+  };
+  window.addEventListener("resize",resize);
+  const observer=new ResizeObserver(resize);observer.observe(sceneRoot);
+  const animate=()=>{
+    if(!reduced){
+      clock+=.016;
+      robot.position.y=Math.sin(clock*1.4)*.12;
+      robot.rotation.y+=(target-robot.rotation.y)*.05;
+      ring.rotation.z=clock*.8;
+      tip.scale.setScalar(1+Math.sin(clock*3)*.2);
+    }
+    renderer.render(scene,camera);
+    frame=requestAnimationFrame(animate);
+  };
+  animate();
+  window.addEventListener("pagehide",()=>{
+    cancelAnimationFrame(frame);
+    observer.disconnect();
+    window.removeEventListener("resize",resize);
+    sceneRoot.removeEventListener("pointermove",mouse);
+    renderer.dispose();
+  },{once:true});
+}catch(error){
+  // The CSS illustration still shows if CDN/WebGL is unavailable.
+  console.info("RoboNav decorative 3D scene uses CSS fallback:",error);
+}
+</script>
+</body></html>

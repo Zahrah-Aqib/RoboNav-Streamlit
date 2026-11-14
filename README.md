@@ -2,9 +2,12 @@
 
 Robot Navigation in an Obstacle-Filled Environment: A Comparative Study of Greedy Best-First Search and A* Search
 
-This is the standalone Python Streamlit + NumPy + Matplotlib project for free Streamlit Community Cloud hosting. The React/Three.js version is a separate project, Final RoboNav Website.
+This is the standalone Python Streamlit + NumPy + Matplotlib project for free Streamlit Community Cloud hosting. Its **Home page recreates the layout and content of the original React RoboNav homepage**, with a decorative 3D robot (and CSS fallback), feature cards and navigation to the real Python simulator. The original React/Three.js app remains a separate project.
 
 ## Features
+
+- Original React-inspired homepage: "Watch your robot think its way home," decorative Three.js robot, simulator/comparison buttons, four feature cards, metric strip and three-step explanation.
+- Default entry page is **Home**; existing simulator, comparison, experiments and methodology remain accessible via the sidebar.
 
 - From-scratch Python 3 A* and Greedy Best-First Search, priority frontier (heapq), visited tracking, Manhattan/Euclidean heuristics.
 - Configurable 2D obstacle map, custom start/goal, random seed and obstacle density, JSON/ASCII input and manual obstacle editor.
@@ -22,20 +25,20 @@ Open PowerShell in the project root:
     .\.venv\Scripts\python.exe -m pip install -r requirements.txt
     .\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
 
-Open http://localhost:8501.
+Open http://localhost:8501. The site opens on Home; the sidebar lets you select Grid Simulator, Algorithm Comparison, Experiment Lab or Methodology.
 
 ## Free Streamlit deployment
 
-1. Create a GitHub repository named RoboNav-Streamlit and push this project to its main branch.
+1. The repository is https://github.com/Zahrah-Aqib/RoboNav-Streamlit.
 2. Sign in at https://share.streamlit.io with GitHub.
-3. Choose Create app, your RoboNav-Streamlit repository, branch main.
-4. Set main file path to streamlit_app.py.
-5. Use Python 3.12 if offered, then deploy.
-6. Use the resulting public Streamlit app link in the final submission.
+3. Open the existing https://robonav-navigation.streamlit.app app and select **Reboot app** if GitHub's latest commit has not loaded automatically.
+4. Keep branch `main`, main file `streamlit_app.py`, and Python 3.12.
+5. Verify the Home page, sidebar navigation, and experiment reports.
 
 ## Project files
 
     streamlit_app.py
+    home/robot_hero.html
     requirements.txt
     .streamlit/config.toml
     backend/algorithms/search.py
